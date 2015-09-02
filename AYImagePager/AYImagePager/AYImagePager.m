@@ -11,11 +11,11 @@
 
 @interface AYImagePager () <UIScrollViewDelegate>
 
-@property (strong, nonatomic) UIScrollView *scrollView;
-@property (strong, nonatomic) UIPageControl *pageControl;
-@property (strong, nonatomic) NSArray *datasourceImages;
-@property (assign, nonatomic) NSUInteger currentSelectedPage;
-@property (strong, nonatomic) void(^completeBlock)(void);
+@property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UIPageControl *pageControl;
+@property (nonatomic, strong) NSArray *datasourceImages;
+@property (nonatomic, assign) NSUInteger currentSelectedPage;
+@property (nonatomic, copy) void(^completeBlock)(void);
 
 @end
 
@@ -46,7 +46,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    NSArray *subViews = self.subviews;
+    NSArray *subViews = _scrollView.subviews;
     if (subViews.count > 0) {
         [subViews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     }
@@ -74,26 +74,30 @@
 }
 
 - (void)initializeScrollView {
-    _scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
-    _scrollView.delegate = self;
-    _scrollView.pagingEnabled = YES;
-    _scrollView.showsHorizontalScrollIndicator = NO;
-    _scrollView.showsVerticalScrollIndicator = NO;
-    _scrollView.autoresizingMask = self.autoresizingMask;
-    _scrollView.scrollsToTop = NO;
-    [self addSubview:_scrollView];
+    if (!_scrollView) {
+        self.scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+        _scrollView.delegate = self;
+        _scrollView.pagingEnabled = YES;
+        _scrollView.showsHorizontalScrollIndicator = NO;
+        _scrollView.showsVerticalScrollIndicator = NO;
+        _scrollView.autoresizingMask = self.autoresizingMask;
+        _scrollView.scrollsToTop = NO;
+        [self addSubview:_scrollView];
+    }
 }
 
 - (void)initializePageControl {
-    CGRect pageControlFrame = CGRectMake(0, 0, CGRectGetWidth(_scrollView.frame), 30);
-    _pageControl = [[UIPageControl alloc] initWithFrame:pageControlFrame];
-    _pageControl.center = CGPointMake(CGRectGetWidth(_scrollView.frame)*0.5, CGRectGetHeight(_scrollView.frame) - 12.);
-    _pageControl.userInteractionEnabled = NO;
-    [self addSubview:_pageControl];
+    if (!_pageControl) {
+        CGRect pageControlFrame = CGRectMake(0, 0, CGRectGetWidth(_scrollView.frame), 30);
+        self.pageControl = [[UIPageControl alloc] initWithFrame:pageControlFrame];
+        _pageControl.center = CGPointMake(CGRectGetWidth(_scrollView.frame)*0.5, CGRectGetHeight(_scrollView.frame) - 12.);
+        _pageControl.userInteractionEnabled = NO;
+        [self addSubview:_pageControl];
+    }
 }
 
 - (void)loadData {
-    _datasourceImages = self.items ? : @[];
+    self.datasourceImages = self.items ? : @[];
     
     if (_datasourceImages.count == 0 && _placeholderImage) {
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:_scrollView.bounds];
