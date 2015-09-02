@@ -21,8 +21,6 @@
 
 @implementation AYImagePager
 
-static void *kContentImageViewObservationContext = &kContentImageViewObservationContext;
-
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -134,14 +132,6 @@ static void *kContentImageViewObservationContext = &kContentImageViewObservation
         if ([imageSource isKindOfClass:[UIImage class]]) {
             imageView.image = imageSource;
         }else if ([imageSource isKindOfClass:[NSString class]] || [imageSource isKindOfClass:[NSURL class]]) {
-            UIActivityIndicatorView *activityIndicatorView = [UIActivityIndicatorView new];
-            activityIndicatorView.center = CGPointMake(CGRectGetWidth(_scrollView.frame) * 0.5, CGRectGetHeight(_scrollView.frame) * 0.5);
-            activityIndicatorView.tag = 100;
-            activityIndicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
-            [activityIndicatorView startAnimating];
-            [imageView addSubview:activityIndicatorView];
-            [imageView addObserver:self forKeyPath:@"image" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:kContentImageViewObservationContext];
-            
             [imageView sd_setImageWithURL:[imageSource isKindOfClass:[NSString class]] ? [NSURL URLWithString:imageSource] : imageSource placeholderImage:_placeholderImage];
         }
         [_scrollView addSubview:imageView];
@@ -214,16 +204,6 @@ static void *kContentImageViewObservationContext = &kContentImageViewObservation
     [self setSwitchPage:-1 animated:YES withUserInterface:NO];
     
     [self performSelector:_cmd withObject:nil afterDelay:self.autoPlayTimeInterval];
-}
-
-#pragma mark - KVO
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if (context == kContentImageViewObservationContext) {
-        UIImageView *imageView = (UIImageView *)object;
-        UIActivityIndicatorView *activityIndicatorView = (UIActivityIndicatorView *)[imageView viewWithTag:100];
-        [activityIndicatorView removeFromSuperview];
-        [imageView removeObserver:self forKeyPath:@"image"];
-    }
 }
 
 #pragma mark - UIScrollViewDelegate
