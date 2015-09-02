@@ -8,11 +8,12 @@
 
 #import "AYImagePager.h"
 #import "UIImageView+WebCache.h"
+#import "SMPageControl.h"
 
 @interface AYImagePager () <UIScrollViewDelegate>
 
 @property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) UIPageControl *pageControl;
+@property (nonatomic, strong) SMPageControl *pageControl;
 @property (nonatomic, strong) NSArray *datasourceImages;
 @property (nonatomic, assign) NSUInteger currentSelectedPage;
 @property (nonatomic, copy) void(^completeBlock)(void);
@@ -41,6 +42,8 @@
     _continuous = YES;
     _autoPlayTimeInterval = 3;
     _contentModeOfImage = UIViewContentModeScaleAspectFill;
+    
+    _pageControlAlignment = AYPageControlAlignmentCenter;
 }
 
 - (void)layoutSubviews {
@@ -75,7 +78,7 @@
 
 - (void)initializeScrollView {
     if (!_scrollView) {
-        self.scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+        self.scrollView = [[UIScrollView alloc] init];
         _scrollView.delegate = self;
         _scrollView.pagingEnabled = YES;
         _scrollView.showsHorizontalScrollIndicator = NO;
@@ -84,16 +87,22 @@
         _scrollView.scrollsToTop = NO;
         [self addSubview:_scrollView];
     }
+    _scrollView.frame = self.bounds;
 }
 
 - (void)initializePageControl {
     if (!_pageControl) {
-        CGRect pageControlFrame = CGRectMake(0, 0, CGRectGetWidth(_scrollView.frame), 30);
-        self.pageControl = [[UIPageControl alloc] initWithFrame:pageControlFrame];
-        _pageControl.center = CGPointMake(CGRectGetWidth(_scrollView.frame)*0.5, CGRectGetHeight(_scrollView.frame) - 12.);
+        self.pageControl = [[SMPageControl alloc] init];
         _pageControl.userInteractionEnabled = NO;
+        _pageControl.hidesForSinglePage = YES;
         [self addSubview:_pageControl];
     }
+    _pageControl.frame = CGRectMake(10, CGRectGetHeight(_scrollView.frame) - 20, CGRectGetWidth(_scrollView.frame) - 20, 20);
+    _pageControl.alignment = (SMPageControlAlignment)_pageControlAlignment;
+    _pageControl.pageIndicatorImage = _indicatorImage;
+    _pageControl.currentPageIndicatorImage = _indicatorSelectedImage;
+    _pageControl.pageIndicatorTintColor = _indicatorColor;
+    _pageControl.currentPageIndicatorTintColor = _indicatorSelectedColor;
 }
 
 - (void)loadData {
@@ -158,7 +167,7 @@
     [self setNeedsLayout];
 }
 
-- (void)scrollToIndex:(NSInteger)toIndex animated:(BOOL)animated {
+- (void)scrollToIndex:(NSUInteger)toIndex animated:(BOOL)animated {
     NSInteger page = MIN(_datasourceImages.count - 1, MAX(0, toIndex));
     
     [self setSwitchPage:page animated:animated withUserInterface:YES];
@@ -188,13 +197,13 @@
                 page = _datasourceImages.count - 3;
                 _currentSelectedPage = 0;
                 [self moveToTargetPosition:CGRectGetWidth(_scrollView.frame) * (page + 2) withAnimated:animated];
-            }else {
+            } else {
                 [self moveToTargetPosition:CGRectGetWidth(_scrollView.frame) * (page + 1) withAnimated:animated];
             }
-        }else {
+        } else {
             [self moveToTargetPosition:0 withAnimated:animated];
         }
-    }else {
+    } else {
         [self moveToTargetPosition:CGRectGetWidth(_scrollView.frame) * page withAnimated:animated];
     }
     
@@ -258,6 +267,17 @@
     if ([self.delegate respondsToSelector:@selector(ay_imagePager:didSelectedAtIndex:)]) {
         [self.delegate ay_imagePager:self didSelectedAtIndex:self.isContinuous ? --page : page];
     }
+}
+
+#pragma mark - page control properties setter
+- (void)setIndicatorImage:(UIImage *)indicatorImage {
+    _indicatorImage = indicatorImage;
+    self.pageControl.pageIndicatorImage = _indicatorImage;
+}
+
+- (void)setIndicatorSelectedImage:(UIImage *)indicatorSelectedImage {
+    _indicatorSelectedImage = indicatorSelectedImage;
+    self.pageControl.currentPageIndicatorImage = _indicatorSelectedImage;
 }
 
 @end

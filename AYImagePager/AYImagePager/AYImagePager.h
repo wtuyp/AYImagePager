@@ -8,6 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSUInteger, AYPageControlAlignment) {
+    AYPageControlAlignmentLeft = 1,
+    AYPageControlAlignmentCenter,
+    AYPageControlAlignmentRight
+};
+
 @class AYImagePager;
 
 @protocol AYImagePagerDelegate <NSObject>
@@ -23,12 +29,20 @@
 @property (nonatomic, strong) NSArray *items;                           //support NSString\UIImage
 @property (nonatomic, weak) id <AYImagePagerDelegate> delegate;
 @property (nonatomic, assign, getter = isContinuous) BOOL continuous;   //default is YES
-@property (nonatomic, assign) NSUInteger autoPlayTimeInterval;          //default is 3 seconds
+@property (nonatomic, assign) NSUInteger autoPlayTimeInterval;          //default is 3 seconds; if = 0, auto play disable
 @property (nonatomic, strong) UIImage *placeholderImage;
 @property (nonatomic, assign) UIViewContentMode contentModeOfImage;
 
+@property (nonatomic, assign) AYPageControlAlignment pageControlAlignment;  //default is AYPageControlAlignmentCenter
+@property (nonatomic, strong) UIImage *indicatorImage;                      //16*16@2x, would be better
+@property (nonatomic, strong) UIImage *indicatorSelectedImage;
+@property (nonatomic, strong) UIColor *indicatorColor;                      // ignored if indicatorImage is set
+@property (nonatomic, strong) UIColor *indicatorSelectedColor;              // ignored if indicatorSelectedImage is set
+
+
+
 - (void)reloadData;
 - (void)reloadDataWithCompleteBlock:(void(^)(void))competeBlock;
-- (void)scrollToIndex:(NSInteger)toIndex animated:(BOOL)animated;
+- (void)scrollToIndex:(NSUInteger)toIndex animated:(BOOL)animated;
 
 @end
