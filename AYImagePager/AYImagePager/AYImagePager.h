@@ -24,20 +24,21 @@ typedef NS_ENUM(NSUInteger, AYPageControlAlignment) {
 
 @end
 
+IB_DESIGNABLE
 @interface AYImagePager : UIView
 
-@property (nonatomic, strong) NSArray *items;                               //support NSString\UIImage
+@property (nonatomic, strong) NSArray *items;                                           //support NSString\UIImage
 @property (nonatomic, weak) id <AYImagePagerDelegate> delegate;
-@property (nonatomic, assign, getter = isContinuous) BOOL continuous;       //default is YES
-@property (nonatomic, assign) NSTimeInterval autoPlayTimeInterval;          //default is 3 seconds; if = 0, auto play disable
-@property (nonatomic, strong) UIImage *placeholderImage;
-@property (nonatomic, assign) UIViewContentMode contentModeOfImage;         //default is UIViewContentModeScaleAspectFill
+@property (nonatomic, assign, getter = isContinuous) IBInspectable BOOL continuous;     //default is YES
+@property (nonatomic, assign) NSTimeInterval autoPlayTimeInterval;                      //default is 3 seconds; if = 0, auto play disable
+@property (nonatomic, strong) IBInspectable UIImage *placeholderImage;
+@property (nonatomic, assign) UIViewContentMode contentModeOfImage;                     //default is UIViewContentModeScaleAspectFill
 
-@property (nonatomic, assign) AYPageControlAlignment pageControlAlignment;  //default is AYPageControlAlignmentCenter
-@property (nonatomic, strong) UIImage *indicatorImage;                      //16*16@2x, would be better
-@property (nonatomic, strong) UIImage *indicatorSelectedImage;
-@property (nonatomic, strong) UIColor *indicatorColor;                      // ignored if indicatorImage is set
-@property (nonatomic, strong) UIColor *indicatorSelectedColor;              // ignored if indicatorSelectedImage is set
+@property (nonatomic, assign) AYPageControlAlignment pageControlAlignment;              //default is AYPageControlAlignmentCenter
+@property (nonatomic, strong) IBInspectable UIImage *indicatorImage;                    //16*16@2x, would be better
+@property (nonatomic, strong) IBInspectable UIImage *indicatorSelectedImage;
+@property (nonatomic, strong) IBInspectable UIColor *indicatorColor;                    // ignored if indicatorImage is set
+@property (nonatomic, strong) IBInspectable UIColor *indicatorSelectedColor;            // ignored if indicatorSelectedImage is set
 
 
 

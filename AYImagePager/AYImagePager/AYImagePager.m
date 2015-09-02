@@ -104,14 +104,15 @@
 }
 
 - (void)loadData {
-    self.datasourceImages = [self.items copy] ? : @[];
+    self.datasourceImages = self.items ? [self.items copy] : @[];
     
-    if (_datasourceImages.count == 0 && _placeholderImage) {
-        UIImageView *imageView = [[UIImageView alloc] initWithFrame:_scrollView.bounds];
-        imageView.contentMode = _contentModeOfImage;
-        imageView.image = _placeholderImage;
-        [_scrollView addSubview:imageView];
-        
+    if (_datasourceImages.count == 0) {
+        if (_placeholderImage) {
+            UIImageView *imageView = [[UIImageView alloc] initWithFrame:_scrollView.bounds];
+            imageView.contentMode = _contentModeOfImage;
+            imageView.image = _placeholderImage;
+            [_scrollView addSubview:imageView];
+        }
         return;
     }
     
