@@ -16,13 +16,13 @@
 @property (nonatomic, strong) SMPageControl *pageControl;
 @property (nonatomic, strong) NSArray *datasourceImages;
 @property (nonatomic, assign) NSUInteger currentSelectedPage;
-@property (nonatomic, copy) void(^completeBlock)(void);
+@property (nonatomic, copy) void(^reloadCompleteBlock)(void);
 
 @end
 
 @implementation AYImagePager
 
-- (id)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         [self initProperties];
@@ -30,7 +30,7 @@
     return self;
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
         [self initProperties];
@@ -40,7 +40,7 @@
 
 - (void)initProperties {
     _continuous = YES;
-    _autoPlayTimeInterval = 3;
+    _autoPlayTimeInterval = 3.0;
     _contentModeOfImage = UIViewContentModeScaleAspectFill;
     
     _pageControlAlignment = AYPageControlAlignmentCenter;
@@ -56,8 +56,8 @@
     
     [self initialize];
     
-    if (self.completeBlock) {
-        self.completeBlock();
+    if (self.reloadCompleteBlock) {
+        self.reloadCompleteBlock();
     }
 }
 
@@ -69,10 +69,8 @@
     
     [self loadData];
     
-    if (self.autoPlayTimeInterval > 0) {
-        if ((self.isContinuous && _datasourceImages.count > 3) || (!self.isContinuous && _datasourceImages.count > 1)) {
-            [self performSelector:@selector(autoPlayImagePage) withObject:nil afterDelay:self.autoPlayTimeInterval];
-        }
+    if ((self.autoPlayTimeInterval > 0.0) && (self.items.count > 1)) {
+        [self performSelector:@selector(autoPlayImagePage) withObject:nil afterDelay:self.autoPlayTimeInterval];
     }
 }
 
@@ -106,7 +104,7 @@
 }
 
 - (void)loadData {
-    self.datasourceImages = self.items ? : @[];
+    self.datasourceImages = [self.items copy] ? : @[];
     
     if (_datasourceImages.count == 0 && _placeholderImage) {
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:_scrollView.bounds];
@@ -158,12 +156,12 @@
 }
 
 - (void)reloadData {
-    self.completeBlock = nil;
+    self.reloadCompleteBlock = nil;
     [self setNeedsLayout];
 }
 
 - (void)reloadDataWithCompleteBlock:(void(^)(void))competeBlock {
-    self.completeBlock = competeBlock;
+    self.reloadCompleteBlock = competeBlock;
     [self setNeedsLayout];
 }
 
