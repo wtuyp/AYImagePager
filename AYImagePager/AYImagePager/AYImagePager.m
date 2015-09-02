@@ -9,7 +9,7 @@
 #import "AYImagePager.h"
 #import "UIImageView+WebCache.h"
 
-@interface AYImagePager () <UIScrollViewDelegate, UIGestureRecognizerDelegate>
+@interface AYImagePager () <UIScrollViewDelegate>
 
 @property (strong, nonatomic) UIScrollView *scrollView;
 @property (strong, nonatomic) UIPageControl *pageControl;
@@ -21,8 +21,7 @@
 
 @implementation AYImagePager
 
-- (id)initWithFrame:(CGRect)frame
-{
+- (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         [self initProperties];
@@ -31,7 +30,8 @@
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
-    if (self = [super initWithCoder:aDecoder]) {
+    self = [super initWithCoder:aDecoder];
+    if (self) {
         [self initProperties];
     }
     return self;
@@ -40,6 +40,7 @@
 - (void)initProperties {
     _continuous = YES;
     _autoPlayTimeInterval = 3;
+    _contentModeOfImage = UIViewContentModeScaleAspectFill;
 }
 
 - (void)layoutSubviews {
@@ -67,13 +68,13 @@
     
     if (self.autoPlayTimeInterval > 0) {
         if ((self.isContinuous && _datasourceImages.count > 3) || (!self.isContinuous && _datasourceImages.count > 1)) {
-            [self performSelector:@selector(autoSwitchBannerView) withObject:nil afterDelay:self.autoPlayTimeInterval];
+            [self performSelector:@selector(autoPlayImagePage) withObject:nil afterDelay:self.autoPlayTimeInterval];
         }
     }
 }
 
 - (void)initializeScrollView {
-    _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
+    _scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
     _scrollView.delegate = self;
     _scrollView.pagingEnabled = YES;
     _scrollView.showsHorizontalScrollIndicator = NO;
@@ -94,14 +95,12 @@
 - (void)loadData {
     _datasourceImages = self.items ? : @[];
     
-    if (_datasourceImages.count == 0) {
-        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(_scrollView.frame), CGRectGetHeight(_scrollView.frame))];
-        imageView.contentMode = UIViewContentModeScaleAspectFill;
-        imageView.backgroundColor = [UIColor clearColor];
-        if (_placeholderImage) {
-            imageView.image = _placeholderImage;
-        }
+    if (_datasourceImages.count == 0 && _placeholderImage) {
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:_scrollView.bounds];
+        imageView.contentMode = _contentModeOfImage;
+        imageView.image = _placeholderImage;
         [_scrollView addSubview:imageView];
+        
         return;
     }
     
@@ -124,15 +123,14 @@
         CGRect imgRect = CGRectMake(contentWidth * i, 0, contentWidth, contentHeight);
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:imgRect];
         imageView.backgroundColor = [UIColor clearColor];
-        if (_contentModeOfImage) {
-            imageView.contentMode = _contentModeOfImage;
-        }
+        imageView.contentMode = _contentModeOfImage;
         
-        id imageSource = [_datasourceImages objectAtIndex:i];
-        if ([imageSource isKindOfClass:[UIImage class]]) {
+        id imageSource = _datasourceImages[i];
+        if ([imageSource isKindOfClass:[NSString class]]) {
+            [imageView sd_setImageWithURL:[NSURL URLWithString:imageSource]
+                         placeholderImage:_placeholderImage];
+        } else if ([imageSource isKindOfClass:[UIImage class]]) {
             imageView.image = imageSource;
-        }else if ([imageSource isKindOfClass:[NSString class]] || [imageSource isKindOfClass:[NSURL class]]) {
-            [imageView sd_setImageWithURL:[imageSource isKindOfClass:[NSString class]] ? [NSURL URLWithString:imageSource] : imageSource placeholderImage:_placeholderImage];
         }
         [_scrollView addSubview:imageView];
     }
@@ -141,10 +139,7 @@
         _scrollView.contentOffset = CGPointMake(CGRectGetWidth(_scrollView.frame), 0);
     }
     
-    // single tap gesture recognizer
     UITapGestureRecognizer *tapGestureRecognize = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureRecognizer:)];
-    tapGestureRecognize.delegate = self;
-    tapGestureRecognize.numberOfTapsRequired = 1;
     [_scrollView addGestureRecognizer:tapGestureRecognize];
     
 }
@@ -159,14 +154,18 @@
     [self setNeedsLayout];
 }
 
-- (void)moveToTargetPosition:(CGFloat)targetX withAnimated:(BOOL)animated {
-    [_scrollView setContentOffset:CGPointMake(targetX, 0) animated:animated];
-}
-
 - (void)scrollToIndex:(NSInteger)toIndex animated:(BOOL)animated {
     NSInteger page = MIN(_datasourceImages.count - 1, MAX(0, toIndex));
     
     [self setSwitchPage:page animated:animated withUserInterface:YES];
+}
+
+- (void)autoPlayImagePage {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(autoPlayImagePage) object:nil];
+    
+    [self setSwitchPage:-1 animated:YES withUserInterface:NO];
+    
+    [self performSelector:_cmd withObject:nil afterDelay:self.autoPlayTimeInterval];
 }
 
 - (void)setSwitchPage:(NSInteger)switchPage animated:(BOOL)animated withUserInterface:(BOOL)userInterface {
@@ -198,37 +197,33 @@
     [self scrollViewDidScroll:_scrollView];
 }
 
-- (void)autoSwitchBannerView {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(autoSwitchBannerView) object:nil];
-    
-    [self setSwitchPage:-1 animated:YES withUserInterface:NO];
-    
-    [self performSelector:_cmd withObject:nil afterDelay:self.autoPlayTimeInterval];
+- (void)moveToTargetPosition:(CGFloat)targetX withAnimated:(BOOL)animated {
+    [_scrollView setContentOffset:CGPointMake(targetX, 0) animated:animated];
 }
 
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     CGFloat targetX = scrollView.contentOffset.x;
     
-    CGFloat item_width = CGRectGetWidth(scrollView.frame);
+    CGFloat pageWidth = CGRectGetWidth(scrollView.frame);
     
     if (self.isContinuous && _datasourceImages.count >= 3) {
-        if (targetX >= item_width * (_datasourceImages.count - 1)) {
-            targetX = item_width;
+        if (targetX >= pageWidth * (_datasourceImages.count - 1)) {
+            targetX = pageWidth;
             _scrollView.contentOffset = CGPointMake(targetX, 0);
-        }else if (targetX <= 0) {
-            targetX = item_width * (_datasourceImages.count - 2);
+        } else if (targetX <= 0) {
+            targetX = pageWidth * (_datasourceImages.count - 2);
             _scrollView.contentOffset = CGPointMake(targetX, 0);
         }
     }
     
-    NSInteger page = (scrollView.contentOffset.x + item_width * 0.5) / item_width;
+    NSInteger page = (scrollView.contentOffset.x + pageWidth * 0.5) / pageWidth;
     
     if (self.isContinuous && _datasourceImages.count > 1) {
         page--;
         if (page >= _pageControl.numberOfPages) {
             page = 0;
-        }else if (page < 0) {
+        } else if (page < 0) {
             page = _pageControl.numberOfPages - 1;
         }
     }
@@ -245,11 +240,11 @@
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(autoSwitchBannerView) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(autoPlayImagePage) object:nil];
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    [self performSelector:@selector(autoSwitchBannerView) withObject:nil afterDelay:self.autoPlayTimeInterval];
+    [self performSelector:@selector(autoPlayImagePage) withObject:nil afterDelay:self.autoPlayTimeInterval];
 }
 
 #pragma mark - UITapGestureRecognizerSelector

@@ -20,7 +20,7 @@
 
 @interface AYImagePager : UIView
 
-@property (nonatomic, strong) NSArray *items;                           //support NSString\NSURL\UIImage
+@property (nonatomic, strong) NSArray *items;                           //support NSString\UIImage
 @property (nonatomic, weak) id <AYImagePagerDelegate> delegate;
 @property (nonatomic, assign, getter = isContinuous) BOOL continuous;   //default is YES
 @property (nonatomic, assign) NSUInteger autoPlayTimeInterval;          //default is 3 seconds
