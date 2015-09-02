@@ -12,7 +12,7 @@ Image Pager -- 轮播图
  3. 滚动方式多样包括：平移、淡出淡入
  4. 加入标题
  5. 加入一些block，比如点击block
- 6. IBInspectable / IBDesignable 支持
+ 6. ~~IBInspectable / IBDesignable 支持~~
  7. UIImageView复用
 
 ## Inspiration
