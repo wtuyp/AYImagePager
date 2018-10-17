@@ -68,15 +68,11 @@
     [self initializePageControl];
     
     [self loadData];
-    
-    if ((self.autoPlayTimeInterval > 0.0) && (self.items.count > 1)) {
-        [self performSelector:@selector(autoPlayImagePage) withObject:nil afterDelay:self.autoPlayTimeInterval];
-    }
 }
 
 - (void)initializeScrollView {
     if (!_scrollView) {
-        self.scrollView = [[UIScrollView alloc] init];
+        _scrollView = [[UIScrollView alloc] init];
         _scrollView.delegate = self;
         _scrollView.pagingEnabled = YES;
         _scrollView.showsHorizontalScrollIndicator = NO;
@@ -104,7 +100,7 @@
 }
 
 - (void)loadData {
-    self.datasourceImages = self.items ? [self.items copy] : @[];
+    self.datasourceImages = self.items ? : @[];
     
     if (_datasourceImages.count == 0) {
         if (_placeholderImage) {
@@ -135,6 +131,7 @@
         CGRect imgRect = CGRectMake(contentWidth * i, 0, contentWidth, contentHeight);
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:imgRect];
         imageView.backgroundColor = [UIColor clearColor];
+        imageView.clipsToBounds = YES;
         imageView.contentMode = _contentModeOfImage;
         
         id imageSource = _datasourceImages[i];
@@ -154,6 +151,9 @@
     UITapGestureRecognizer *tapGestureRecognize = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureRecognizer:)];
     [_scrollView addGestureRecognizer:tapGestureRecognize];
     
+    if ((self.autoPlayTimeInterval > 0.0) && (self.items.count > 1)) {
+        [self performSelector:@selector(autoPlayImagePage) withObject:nil afterDelay:self.autoPlayTimeInterval];
+    }
 }
 
 - (void)reloadData {
@@ -170,14 +170,6 @@
     NSInteger page = MIN(_datasourceImages.count - 1, MAX(0, toIndex));
     
     [self setSwitchPage:page animated:animated withUserInterface:YES];
-}
-
-- (void)autoPlayImagePage {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(autoPlayImagePage) object:nil];
-    
-    [self setSwitchPage:-1 animated:YES withUserInterface:NO];
-    
-    [self performSelector:_cmd withObject:nil afterDelay:self.autoPlayTimeInterval];
 }
 
 - (void)setSwitchPage:(NSInteger)switchPage animated:(BOOL)animated withUserInterface:(BOOL)userInterface {
@@ -213,6 +205,14 @@
     [_scrollView setContentOffset:CGPointMake(targetX, 0) animated:animated];
 }
 
+- (void)autoPlayImagePage {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(autoPlayImagePage) object:nil];
+    
+    [self setSwitchPage:-1 animated:YES withUserInterface:NO];
+    
+    [self performSelector:_cmd withObject:nil afterDelay:self.autoPlayTimeInterval];
+}
+
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     CGFloat targetX = scrollView.contentOffset.x;
@@ -240,14 +240,14 @@
         }
     }
     
-    _currentSelectedPage = page;
     
-    if (page != _pageControl.currentPage) {
+    if (page != _currentSelectedPage) {
         if ([self.delegate respondsToSelector:@selector(ay_imagePager:didScrollToIndex:)]) {
             [self.delegate ay_imagePager:self didScrollToIndex:page];
         }
     }
     
+    _currentSelectedPage = page;
     _pageControl.currentPage = page;
 }
 
@@ -280,3 +280,4 @@
 }
 
 @end
+
