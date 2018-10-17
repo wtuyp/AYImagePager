@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SMPageControl.h"
 
 typedef NS_ENUM(NSUInteger, AYPageControlAlignment) {
     AYPageControlAlignmentLeft = 1,
@@ -33,6 +34,8 @@ IB_DESIGNABLE
 @property (nonatomic, assign) NSTimeInterval autoPlayTimeInterval;                      //default is 3 seconds; if = 0, auto play disable
 @property (nonatomic, strong) IBInspectable UIImage *placeholderImage;
 @property (nonatomic, assign) UIViewContentMode contentModeOfImage;                     //default is UIViewContentModeScaleAspectFill
+
+@property (nonatomic, strong) SMPageControl *pageControl;
 
 @property (nonatomic, assign) AYPageControlAlignment pageControlAlignment;              //default is AYPageControlAlignmentCenter
 @property (nonatomic, strong) IBInspectable UIImage *indicatorImage;                    //16*16@2x, would be better

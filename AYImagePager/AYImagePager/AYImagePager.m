@@ -8,12 +8,10 @@
 
 #import "AYImagePager.h"
 #import "UIImageView+WebCache.h"
-#import "SMPageControl.h"
 
 @interface AYImagePager () <UIScrollViewDelegate>
 
 @property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) SMPageControl *pageControl;
 @property (nonatomic, strong) NSArray *datasourceImages;
 @property (nonatomic, assign) NSUInteger currentSelectedPage;
 @property (nonatomic, copy) void(^reloadCompleteBlock)(void);
@@ -46,6 +44,9 @@
     _contentModeOfImage = UIViewContentModeScaleAspectFill;
     
     _pageControlAlignment = AYPageControlAlignmentCenter;
+    
+    [self addSubview:self.scrollView];
+    [self addSubview:self.pageControl];
 }
 
 - (void)layoutSubviews {
@@ -65,13 +66,13 @@
 
 - (void)initialize {
     
-    [self initializeScrollView];
-    [self initializePageControl];
+    [self configScrollView];
+    [self configPageControl];
     
     [self loadData];
 }
 
-- (void)initializeScrollView {
+- (UIScrollView *)scrollView {
     if (!_scrollView) {
         _scrollView = [[UIScrollView alloc] init];
         _scrollView.delegate = self;
@@ -80,18 +81,24 @@
         _scrollView.showsVerticalScrollIndicator = NO;
         _scrollView.autoresizingMask = self.autoresizingMask;
         _scrollView.scrollsToTop = NO;
-        [self addSubview:_scrollView];
     }
-    _scrollView.frame = self.bounds;
+    return _scrollView;
 }
 
-- (void)initializePageControl {
+- (SMPageControl *)pageControl {
     if (!_pageControl) {
         self.pageControl = [[SMPageControl alloc] init];
         _pageControl.userInteractionEnabled = NO;
         _pageControl.hidesForSinglePage = YES;
-        [self addSubview:_pageControl];
     }
+    return _pageControl;
+}
+
+- (void)configScrollView {
+    _scrollView.frame = self.bounds;
+}
+
+- (void)configPageControl {
     _pageControl.frame = CGRectMake(10, CGRectGetHeight(_scrollView.frame) - 20, CGRectGetWidth(_scrollView.frame) - 20, 20);
     _pageControl.alignment = (SMPageControlAlignment)_pageControlAlignment;
     _pageControl.pageIndicatorImage = _indicatorImage;
@@ -121,7 +128,7 @@
     _pageControl.numberOfPages = _datasourceImages.count;
     _pageControl.currentPage = 0;
     
-    if (self.isContinuous) {
+    if (self.isContinuous && self.datasourceImages.count > 1) {
         NSMutableArray *cycleDatasource = [_datasourceImages mutableCopy];
         [cycleDatasource insertObject:[_datasourceImages lastObject] atIndex:0];
         [cycleDatasource addObject:[_datasourceImages firstObject]];
