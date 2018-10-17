@@ -102,6 +102,11 @@
 - (void)loadData {
     self.datasourceImages = self.items ? : @[];
     
+    CGFloat contentWidth = CGRectGetWidth(_scrollView.frame);
+    CGFloat contentHeight = CGRectGetHeight(_scrollView.frame);
+    
+    _scrollView.contentSize = CGSizeMake(contentWidth * _datasourceImages.count, contentHeight);
+    
     if (_datasourceImages.count == 0) {
         if (_placeholderImage) {
             UIImageView *imageView = [[UIImageView alloc] initWithFrame:_scrollView.bounds];
@@ -121,11 +126,6 @@
         [cycleDatasource addObject:[_datasourceImages firstObject]];
         _datasourceImages = [cycleDatasource copy];
     }
-    
-    CGFloat contentWidth = CGRectGetWidth(_scrollView.frame);
-    CGFloat contentHeight = CGRectGetHeight(_scrollView.frame);
-    
-    _scrollView.contentSize = CGSizeMake(contentWidth * _datasourceImages.count, contentHeight);
     
     for (NSInteger i = 0; i < _datasourceImages.count; i++) {
         CGRect imgRect = CGRectMake(contentWidth * i, 0, contentWidth, contentHeight);
