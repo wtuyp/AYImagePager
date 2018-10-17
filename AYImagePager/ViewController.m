@@ -23,15 +23,15 @@
     // Do any additional setup after loading the view, typically from a nib.
     
     _pager = [[AYImagePager alloc] initWithFrame:CGRectMake(0, 100, [UIScreen mainScreen].bounds.size.width, 200)];
-    _pager.items = @[@"http://d.hiphotos.baidu.com/image/w%3D2048/sign=5ad7fab780025aafd33279cbcfd5aa64/8601a18b87d6277f15eb8e4f2a381f30e824fcc8.jpg",
-                    @"http://e.hiphotos.baidu.com/image/w%3D2048/sign=df5d0b61cdfc1e17fdbf8b317ea8f703/0bd162d9f2d3572c8d2b20ab8813632763d0c3f8.jpg"];
+    _pager.items = @[@"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539765111044&di=8f1e0d52afb0aa6e2e510dcda993b3dc&imgtype=0&src=http%3A%2F%2Fi9.download.fd.pchome.net%2Ft_960x600%2Fg1%2FM00%2F08%2F00%2FoYYBAFNrk5aIOxRVAA6o5j6_TrMAABhAwBaFnkADqj-144.jpg",
+                    @"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539765111042&di=18380fc488c03b7ba1c629457896cb9d&imgtype=0&src=http%3A%2F%2Fgss0.baidu.com%2F7Po3dSag_xI4khGko9WTAnF6hhy%2Fzhidao%2Fpic%2Fitem%2Ff636afc379310a551ceaaf92b04543a98326108d.jpg"];
     _pager.delegate = self;
     _pager.indicatorColor = [UIColor colorWithRed:0.609 green:0.775 blue:1.000 alpha:1.000];
     [self.view addSubview:_pager];
     
     
-    _pagerIB.items = @[@"http://d.hiphotos.baidu.com/image/w%3D2048/sign=5ad7fab780025aafd33279cbcfd5aa64/8601a18b87d6277f15eb8e4f2a381f30e824fcc8.jpg",
-                       @"http://e.hiphotos.baidu.com/image/w%3D2048/sign=df5d0b61cdfc1e17fdbf8b317ea8f703/0bd162d9f2d3572c8d2b20ab8813632763d0c3f8.jpg"];
+    _pagerIB.items = @[@"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539765111039&di=837a4738798b5dc7bf6ff4335953dd7b&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F011cf15548caf50000019ae9c5c728.jpg%402o.jpg",
+                       @"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539765111044&di=8f1e0d52afb0aa6e2e510dcda993b3dc&imgtype=0&src=http%3A%2F%2Fi9.download.fd.pchome.net%2Ft_960x600%2Fg1%2FM00%2F08%2F00%2FoYYBAFNrk5aIOxRVAA6o5j6_TrMAABhAwBaFnkADqj-144.jpg"];
     
     [self performSelector:@selector(reloadPager) withObject:nil afterDelay:7];
 }
@@ -42,10 +42,9 @@
 }
 
 - (void)reloadPager {
-    _pager.items = @[@"http://d.hiphotos.baidu.com/image/w%3D2048/sign=ed59838948ed2e73fce9812cb339a08b/58ee3d6d55fbb2fb9835341f4d4a20a44623dca5.jpg",
-                     @"http://d.hiphotos.baidu.com/image/w%3D2048/sign=a11d7b94552c11dfded1b823571f63d0/eaf81a4c510fd9f914eee91e272dd42a2934a4c8.jpg",
-                     @"http://d.hiphotos.baidu.com/image/w%3D2048/sign=5ad7fab780025aafd33279cbcfd5aa64/8601a18b87d6277f15eb8e4f2a381f30e824fcc8.jpg",
-                     @"http://e.hiphotos.baidu.com/image/w%3D2048/sign=df5d0b61cdfc1e17fdbf8b317ea8f703/0bd162d9f2d3572c8d2b20ab8813632763d0c3f8.jpg"];
+    _pager.items = @[@"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539765111044&di=8f1e0d52afb0aa6e2e510dcda993b3dc&imgtype=0&src=http%3A%2F%2Fi9.download.fd.pchome.net%2Ft_960x600%2Fg1%2FM00%2F08%2F00%2FoYYBAFNrk5aIOxRVAA6o5j6_TrMAABhAwBaFnkADqj-144.jpg",
+                     @"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539765111042&di=18380fc488c03b7ba1c629457896cb9d&imgtype=0&src=http%3A%2F%2Fgss0.baidu.com%2F7Po3dSag_xI4khGko9WTAnF6hhy%2Fzhidao%2Fpic%2Fitem%2Ff636afc379310a551ceaaf92b04543a98326108d.jpg",
+                     @"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1539765111039&di=837a4738798b5dc7bf6ff4335953dd7b&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F011cf15548caf50000019ae9c5c728.jpg%402o.jpg"];
     _pager.autoPlayTimeInterval = 1.5;
     _pager.pageControlAlignment = AYPageControlAlignmentRight;
     _pager.indicatorImage = [UIImage imageNamed:@"pageDot"];

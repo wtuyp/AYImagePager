@@ -39,6 +39,8 @@
 }
 
 - (void)initProperties {
+    self.clipsToBounds = YES;
+
     _continuous = YES;
     _autoPlayTimeInterval = 3.0;
     _contentModeOfImage = UIViewContentModeScaleAspectFill;
@@ -62,7 +64,6 @@
 }
 
 - (void)initialize {
-    self.clipsToBounds = YES;
     
     [self initializeScrollView];
     [self initializePageControl];
@@ -125,6 +126,8 @@
         [cycleDatasource insertObject:[_datasourceImages lastObject] atIndex:0];
         [cycleDatasource addObject:[_datasourceImages firstObject]];
         _datasourceImages = [cycleDatasource copy];
+        
+        _scrollView.contentSize = CGSizeMake(contentWidth * _datasourceImages.count, contentHeight);
     }
     
     for (NSInteger i = 0; i < _datasourceImages.count; i++) {
